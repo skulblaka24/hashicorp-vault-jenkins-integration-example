@@ -5,47 +5,56 @@ properties(projectProperties)
 pipeline {
   agent any
   stages { 
-    stage('Cleanup') {
-      steps {
-          sh 'echo Cleanup'
-      }
-    }
     stage('Build') {
       steps {
-        echo 'Build Successful!'
+        withVault(configuration: [engineVersion: 2, skipSslVerification: true, timeout: 60, vaultCredentialId: 'vault-approle-access', vaultUrl: 'https://v3.starfly.fr:8200'], vaultSecrets: [[path: 'kv/teb', secretValues: [[envVar: 'SECRET', vaultKey: 'token']]]]) {
+        sh '''
+          set -x
+          export VAULT_TOKEN=$SECRET
+          export VAULT_ADDR="https://v3.starfly.fr:8200"
+          export VAULT_SKIP_VERIFY="true"
+          ./vault status
+          ./vault operator raft list-peers         
+        '''
+        }
+      }
+    }
+    stage('Cleanup Build Stage') {
+      steps {
+          sh 'unset VAULT_TOKEN && unset VAULT_ADDR'
       }
     }
     stage('Test') {
       steps {
-          sh 'echo Test'
+        withVault(configuration: [engineVersion: 2, skipSslVerification: true, timeout: 60, vaultCredentialId: 'vault-token-access', vaultUrl: 'https://v3.starfly.fr:8200'], vaultSecrets: [[path: 'kv/teb', secretValues: [[envVar: 'SECRET', vaultKey: 'token']]]]) {
+        sh '''
+          set -x
+          export VAULT_TOKEN=$SECRET
+          export VAULT_ADDR="https://v3.starfly.fr:8200"
+          export VAULT_SKIP_VERIFY="true"
+          ./vault status
+          ./vault operator raft list-peers         
+        '''
+        }
+      }
+    }
+    stage('Cleanup Test Stage') {
+      steps {
+          sh 'unset VAULT_TOKEN && unset VAULT_ADDR'
       }
     }
     stage('Integration Tests') {
       steps {
       sh 'curl -o vault.zip https://releases.hashicorp.com/vault/1.5.4/vault_1.5.4_linux_amd64.zip ; yes | unzip vault.zip'
-        /*withCredentials([[
-            $class: 'VaultAppRoleCredential',
-            id: 'jenkins-vault',
-            roleId: 'ROLE',
-            secretId: 'SECRET'
-        ]]) {*/
-        withCredentials([[$class: 'VaultTokenCredentialBinding', credentialsId: 'root', vaultAddr: 'https://v3.starfly.fr:8200']]) {
-        // values will be masked
-        sh 'echo TOKEN=$VAULT_TOKEN'
-        sh 'echo ADDR=$VAULT_ADDR'       
+        withCredentials([[$class: 'VaultTokenCredentialBinding', credentialsId: 'vault-token-access', vaultAddr: 'https://v3.starfly.fr:8200']]) {
         sh '''
           set -x
           export VAULT_SKIP_VERIFY="true"
-          export VAULT_ADDR=https://v3.starfly.fr:8200
-          export SECRET_ID=$(./vault write -field=secret_id -f auth/approle/role/java-example/secret-id)
-          export VAULT_TOKEN=$(./vault write -field=token auth/approle/login role_id=${ROLE} secret_id=${SECRET})
-          echo $VAULT_ADDR
+          ./vault status
+          ./vault operator raft list-peers
         '''
         }
       }
     }
-  }
-  environment {
-    mvnHome = 'maven-3.2.5'
   }
 }
