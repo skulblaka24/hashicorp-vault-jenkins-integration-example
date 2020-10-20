@@ -23,7 +23,7 @@ pipeline {
     stage('Integration Tests') {
       steps {
       sh 'curl -o vault.zip https://releases.hashicorp.com/vault/1.5.4/vault_1.5.4_linux_amd64.zip ; yes | unzip vault.zip'
-        withCredential([VaultAppRoleCredential(credentialsId: 'jenkins-vault', roleId: 'ROLE', secretId: 'SECRET')]) {
+        withCredential([[$class: 'VaultAppRoleCredential', id: 'jenkins-vault', roleId: 'ROLE', secretId: 'SECRET']]) {
         sh '''
           set -x
           export VAULT_SKIP_VERIFY="true"
