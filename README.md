@@ -4,6 +4,8 @@ Jenkins pipeline example to access vault secrets
 Instructions:
 -------------
 
+/!\ Needs formating sorry :/
+
 In Vault >
 
 1. Generate token
@@ -86,4 +88,8 @@ In jenkins >
 	Select: Pipeline
 	Click "OK"
 
-3. Go to the end and 
+	Go to the end and in "definition", select "Pipeline Script from SCM".
+	As SCM, choose GIT.
+	Add your repository url where you stored your jenkinsfile.
+	Then click "Save" and run it!
+	
