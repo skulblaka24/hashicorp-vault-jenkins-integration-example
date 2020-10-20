@@ -31,8 +31,8 @@ pipeline {
         ]]) {*/
         withCredentials([[$class: 'VaultTokenCredentialBinding', credentialsId: 'root', vaultAddr: 'https://v3.starfly.fr:8200']]) {
         // values will be masked
-        //sh 'echo TOKEN=$VAULT_TOKEN'
-        //sh 'echo ADDR=$VAULT_ADDR'       
+        sh 'echo TOKEN=$VAULT_TOKEN'
+        sh 'echo ADDR=$VAULT_ADDR'       
         sh '''
           set -x
           export VAULT_SKIP_VERIFY="true"
