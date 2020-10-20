@@ -1,6 +1,20 @@
 def projectProperties = [
     [$class: 'BuildDiscarderProperty',strategy: [$class: 'LogRotator', numToKeepStr: '3']],
 ]
+
+// define the secrets and the env variables
+// engine version can be defined on secret, job, folder or global.
+// the default is engine version 2 unless otherwise specified globally.
+def secrets = [
+  [path: 'secret/test', engineVersion: 2, secretValues: [
+    [vaultKey: 'another_test']]]
+]
+
+// optional configuration, if you do not provide this the next higher configuration
+// (e.g. folder or global) will be used
+def configuration = [vaultUrl: 'http://my-very-other-vault-url.com',
+          vaultCredential: [$class: 'VaultAppRoleCredential'[id: 'jenkins-vault', secretId: 'ROLE', roleId: 'SECRET']], engineVersion: 1
+]
 properties(projectProperties)
 pipeline {
   agent any
@@ -23,18 +37,6 @@ pipeline {
     stage('Integration Tests') {
       steps {
       sh 'curl -o vault.zip https://releases.hashicorp.com/vault/1.5.4/vault_1.5.4_linux_amd64.zip ; yes | unzip vault.zip'
-            // define the secrets and the env variables
-        // engine version can be defined on secret, job, folder or global.
-        // the default is engine version 2 unless otherwise specified globally.
-        def secrets = [
-           [path: 'secret/test', engineVersion: 2, secretValues: [
-             [vaultKey: 'another_test']]]
-        ]
-
-        // optional configuration, if you do not provide this the next higher configuration
-        // (e.g. folder or global) will be used
-        def configuration = [vaultUrl: 'http://my-very-other-vault-url.com',
-                         vaultCredential: [$class: 'VaultAppRoleCredential'[id: 'jenkins-vault', secretId: 'ROLE', roleId: 'SECRET']], engineVersion: 1]
         // inside this block your credentials will be available as env variables
         withVault([configuration: configuration, vaultSecrets: secrets]) {
         //withVault([[$class: 'VaultAppRoleCredential', id: 'jenkins-vault', roleId: 'ROLE', secretId: 'SECRET']]) {
