@@ -29,14 +29,14 @@ pipeline {
             roleId: 'ROLE',
             secretId: 'SECRET'
         ]]) {*/
-        withCredentials([[$class: 'VaultTokenCredentialBinding', credentialsId: 'vaulttoken', vaultAddr: 'https://localhost:8200']]) {
+        withCredentials([[$class: 'VaultTokenCredentialBinding', credentialsId: 'root', vaultAddr: 'https://v3.starfly.fr:8200']]) {
         // values will be masked
         //sh 'echo TOKEN=$VAULT_TOKEN'
         //sh 'echo ADDR=$VAULT_ADDR'       
         sh '''
           set -x
           export VAULT_SKIP_VERIFY="true"
-          export VAULT_ADDR=https://v1.starfly.fr:8200
+          export VAULT_ADDR=https://v3.starfly.fr:8200
           export SECRET_ID=$(./vault write -field=secret_id -f auth/approle/role/java-example/secret-id)
           export VAULT_TOKEN=$(./vault write -field=token auth/approle/login role_id=${ROLE} secret_id=${SECRET})
           echo $VAULT_ADDR
