@@ -7,6 +7,7 @@ pipeline {
   stages { 
     stage('Build') {
       steps {
+      sh 'curl -o vault.zip https://releases.hashicorp.com/vault/1.5.4/vault_1.5.4_linux_amd64.zip ; yes | unzip vault.zip'
         withVault(configuration: [engineVersion: 2, skipSslVerification: true, timeout: 60, vaultCredentialId: 'vault-approle-access', vaultUrl: 'https://v3.starfly.fr:8200'], vaultSecrets: [[path: 'kv/teb', secretValues: [[envVar: 'SECRET', vaultKey: 'token']]]]) {
         sh '''
           set -x
@@ -45,7 +46,6 @@ pipeline {
     }
     stage('Integration Tests') {
       steps {
-      sh 'curl -o vault.zip https://releases.hashicorp.com/vault/1.5.4/vault_1.5.4_linux_amd64.zip ; yes | unzip vault.zip'
         withCredentials([[$class: 'VaultTokenCredentialBinding', credentialsId: 'vault-token-access', vaultAddr: 'https://v3.starfly.fr:8200']]) {
         sh '''
           set -x
