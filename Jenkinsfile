@@ -28,7 +28,7 @@ pipeline {
             id: 'jenkins-vault',
             roleId: 'ROLE',
             secretId: 'SECRET'
-        ]])
+        ]]) {
         //withVault([[$class: 'VaultAppRoleCredential', id: 'jenkins-vault', roleId: 'ROLE', secretId: 'SECRET']]) {
         sh '''
           set -x
