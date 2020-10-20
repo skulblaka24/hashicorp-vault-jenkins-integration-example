@@ -23,13 +23,16 @@ pipeline {
     stage('Integration Tests') {
       steps {
       sh 'curl -o vault.zip https://releases.hashicorp.com/vault/1.5.4/vault_1.5.4_linux_amd64.zip ; yes | unzip vault.zip'
-        withCredentials([[
+        /*withCredentials([[
             $class: 'VaultAppRoleCredential',
             id: 'jenkins-vault',
             roleId: 'ROLE',
             secretId: 'SECRET'
-        ]]) {
-        //withVault([[$class: 'VaultAppRoleCredential', id: 'jenkins-vault', roleId: 'ROLE', secretId: 'SECRET']]) {
+        ]]) {*/
+        withCredentials([[$class: 'VaultTokenCredentialBinding', credentialsId: 'vaulttoken', vaultAddr: 'https://localhost:8200']]) {
+        // values will be masked
+        //sh 'echo TOKEN=$VAULT_TOKEN'
+        //sh 'echo ADDR=$VAULT_ADDR'       
         sh '''
           set -x
           export VAULT_SKIP_VERIFY="true"
