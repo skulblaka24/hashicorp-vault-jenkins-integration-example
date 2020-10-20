@@ -13,7 +13,7 @@ def secrets = [
 // optional configuration, if you do not provide this the next higher configuration
 // (e.g. folder or global) will be used
 def configuration = [vaultUrl: 'http://my-very-other-vault-url.com',
-          vaultCredential: [$class: 'VaultAppRoleCredential': [id: 'jenkins-vault', secretId: 'ROLE', roleId: 'SECRET']], engineVersion: 1
+          vaultCredential: [$class: 'VaultAppRoleCredential', id: 'jenkins-vault', secretId: 'ROLE', roleId: 'SECRET'], engineVersion: 1
 ]
 properties(projectProperties)
 pipeline {
