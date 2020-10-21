@@ -15,11 +15,9 @@ A. **On Vault:**
       	* Add a name: jenkins
       	* Add a Policy:
 
-         ```json
    		path "kv/*" {
    		  capabilities = ["read","list"]
    		}
-         ```
 
       Generate a token:
 
