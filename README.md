@@ -18,10 +18,10 @@ A. **On Vault:**
       	* Add a Policy:
 
          ```json
-      		path "kv/*" {
-      		  capabilities = ["read","list"]
-      		}
-        ```
+   		path "kv/*" {
+   		  capabilities = ["read","list"]
+   		}
+         ```
 
       Generate a token:
 
@@ -35,7 +35,7 @@ A. **On Vault:**
 
       ```shell
       $ vault auth-enable approle
-      ```
+      ```     
 
       Create the approle for Jenkins:
 
