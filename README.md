@@ -4,8 +4,6 @@ Jenkins pipeline example to access vault secrets
 Instructions:
 -------------
 
-/!\ Needs formating sorry :/
-
 A. **On Vault:**
 
 1. Generate token
